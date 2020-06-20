@@ -6,7 +6,7 @@ import gpxpy
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 HTML_DIR = os.path.join(BASE_DIR, 'html')
 
-# map
+# Create the base map with tilesets
 latlng_separation_point = (-40.7819, 172.9978)
 MAP_DEFAULT_LOCATION = latlng_separation_point
 
@@ -36,8 +36,7 @@ for topo in topos:
 
 m.add_child(folium.LatLngPopup()) # enable this if you want to click to see the LatLng
 
-# routes / campsites
-
+# Data for the actual proposed route (and alternate routes)
 KEY_SHORT_DESC = 'short_desc'
 KEY_LOCATION = 'location'
 KEY_WAYPOINTS = 'waypoints'
@@ -65,7 +64,7 @@ route = [
     { KEY_WAYPOINTS: ((-41.2933, 172.4685), (-41.3842, 172.4189), point_trevor_carter),
       KEY_SHORT_DESC: 'Stone', KEY_LOCATION: (-41.4208, 172.4392), },
     { KEY_WAYPOINTS: ((-41.4265, 172.4278), (-41.4538, 172.4242), (-41.4799, 172.3945), (-41.5032, 172.4002)),
-      # see https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/kahurangi-national-park/things-to-do/tracks/matiri-valley-and-1000-acre-plateau-tramping-tracks/
+      KEY_NOTES: 'See https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/kahurangi-national-park/things-to-do/tracks/matiri-valley-and-1000-acre-plateau-tramping-tracks/'
       KEY_SHORT_DESC: 'Hurricane', KEY_LOCATION: (-41.5068, 172.3822), },
     { KEY_WAYPOINTS: ((-41.5872, 172.3631),),
       KEY_SHORT_DESC: 'Lake Matiri', KEY_LOCATION: (-41.6565, 172.3291), },
@@ -89,10 +88,7 @@ alternate_routes = [
   ],
 ]
 
-# put it all together
-
-# The actual TA
-
+# Layer - The actual Te Araroa
 TA_GPX_PATH = os.path.join(BASE_DIR, 'TeAraroaTrail_asRoute.gpx') # courtesy of https://www.teararoa.org.nz/downloads/ - manually edited to remove the North Island routes
 gpx = gpxpy.parse(open(TA_GPX_PATH))
 fg_actual_ta = folium.FeatureGroup(name='The actual Te Araroa', show=True)
@@ -113,28 +109,24 @@ for r in gpx.routes:
 very_end = gpx.routes[-1].points[-1]
 folium.Marker(location=(very_end.latitude, very_end.longitude)).add_to(fg_actual_ta)
 
-# Camp
-fg_camp = folium.FeatureGroup(name='Proposed campsites', show=True)
-fg_camp.add_to(m)
-
-for x in route:
-    popup = folium.Popup(x[KEY_SHORT_DESC])
-    marker = folium.Marker(
-        location=x[KEY_LOCATION],
-        popup=popup,
-    )
-    marker.add_to(fg_camp)
-
-# Route
-fg_route = folium.FeatureGroup(name='Proposed route', show=True)
-fg_route.add_to(m)
+# Layer - Proposed route
+fg_proposed = folium.FeatureGroup(name='Proposed route', show=True)
+fg_proposed.add_to(m)
 
 for i, day in enumerate(route):
+    popup = folium.Popup(day[KEY_SHORT_DESC])
+    marker = folium.Marker(
+        location=day[KEY_LOCATION],
+        popup=popup,
+    )
+    marker.add_to(fg_proposed)
+
     leg = []
     if i == 0:
         pass # do nothing!
     else:
-        wake_up_coord = route[i-1][KEY_LOCATION]
+        yesterday = route[i-1]
+        wake_up_coord = yesterday[KEY_LOCATION]
         leg.append(wake_up_coord)
     if day.get(KEY_WAYPOINTS):
         leg.extend(day[KEY_WAYPOINTS])
@@ -149,32 +141,27 @@ for i, day in enumerate(route):
         color='#ce4429',
         weight=5,
         #popup='{}'.format(day[DAY_DATE]),
-    ).add_to(fg_route)
+    ).add_to(fg_proposed)
 
-# Alternate camps
-fg_alternate_camps = folium.FeatureGroup(name='Alternate campsites', show=True)
-fg_alternate_camps.add_to(m)
+# Layer - Alternate routes
+fg_alternate = folium.FeatureGroup(name='Alternate routes', show=True)
+fg_alternate.add_to(m)
 
-for r in alternate_routes:
-    for x in r:
-        popup = folium.Popup(x[KEY_SHORT_DESC])
+for route in alternate_routes:
+    for i, day in enumerate(route):
+        popup = folium.Popup(day[KEY_SHORT_DESC])
         marker = folium.Marker(
-            location=x[KEY_LOCATION],
+            location=day[KEY_LOCATION],
             popup=popup,
         )
-        marker.add_to(fg_alternate_camps)
+        marker.add_to(fg_alternate)
 
-# Alternate routes
-fg_alternate_routes = folium.FeatureGroup(name='Alternate routes', show=True)
-fg_alternate_routes.add_to(m)
-
-for r in alternate_routes:
-    for i, day in enumerate(r):
         leg = []
         if i == 0:
             pass # do nothing!
         else:
-            wake_up_coord = r[i-1][KEY_LOCATION]
+            yesterday = route[i-1]
+            wake_up_coord = yesterday[KEY_LOCATION]
             leg.append(wake_up_coord)
         if day.get(KEY_WAYPOINTS):
             leg.extend(day[KEY_WAYPOINTS])
@@ -189,7 +176,7 @@ for r in alternate_routes:
             color='#8486d3',
             weight=5,
             #popup='{}'.format(day[DAY_DATE]),
-        ).add_to(fg_alternate_routes)
+        ).add_to(fg_alternate)
 
 # LayerControl - this has to come after all the FeatureGroups
 folium.LayerControl(collapsed=False).add_to(m)
