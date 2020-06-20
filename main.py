@@ -74,7 +74,7 @@ for r in gpx.routes:
         leg.append((p.latitude, p.longitude))
     folium.PolyLine(
         locations=leg,
-        color='#5fbb4f',
+        color='#5fbb4f', # recommendations at https://www.linz.govt.nz/data/linz-data-service/guides-and-documentation/styling-hints-and-tips-for-linz-basemaps
         weight=5,
         popup=r.name,
     ).add_to(fg_actual_ta)
