@@ -1,6 +1,7 @@
 import os
 
 import folium
+import gpxpy
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 HTML_DIR = os.path.join(BASE_DIR, 'html')
@@ -33,7 +34,7 @@ for topo in topos:
     )
     topo_layer.add_to(m)
 
-m.add_child(folium.LatLngPopup()) # enable this if you want to click to see the LatLng
+#m.add_child(folium.LatLngPopup()) # enable this if you want to click to see the LatLng
 
 # routes / campsites
 
@@ -58,9 +59,30 @@ route = [
 
 # put it all together
 
+# The actual TA
+
+TA_GPX_PATH = os.path.join(BASE_DIR, 'TeAraroaTrail_asRoute.gpx') # courtesy of https://www.teararoa.org.nz/downloads/ - manually edited to remove the North Island routes
+gpx = gpxpy.parse(open(TA_GPX_PATH))
+fg_actual_ta = folium.FeatureGroup(name='The actual Te Araroa', show=True)
+fg_actual_ta.add_to(m)
+
+for r in gpx.routes:
+    leg_start = r.points[0]
+    folium.Marker(location=(leg_start.latitude, leg_start.longitude)).add_to(fg_actual_ta)
+    leg = []
+    for p in r.points:
+        leg.append((p.latitude, p.longitude))
+    folium.PolyLine(
+        locations=leg,
+        color='#5fbb4f',
+        weight=5,
+        popup=r.name,
+    ).add_to(fg_actual_ta)
+very_end = gpx.routes[-1].points[-1]
+folium.Marker(location=(very_end.latitude, very_end.longitude)).add_to(fg_actual_ta)
+
 # Camp
-fg_camp_name = 'Campsites'
-fg_camp = folium.FeatureGroup(name=fg_camp_name, show=True)
+fg_camp = folium.FeatureGroup(name='Proposed campsites', show=True)
 fg_camp.add_to(m)
 
 for x in route:
@@ -72,7 +94,7 @@ for x in route:
     marker.add_to(fg_camp)
 
 # Route
-fg_route = folium.FeatureGroup(name='Route', show=True)
+fg_route = folium.FeatureGroup(name='Proposed route', show=True)
 fg_route.add_to(m)
 
 for i, day in enumerate(route):
@@ -92,13 +114,13 @@ for i, day in enumerate(route):
 
     folium.PolyLine(
         locations=leg,
-        color='#FF0000',
+        color='#ce4429',
         weight=5,
         #popup='{}'.format(day[DAY_DATE]),
     ).add_to(fg_route)
 
 # LayerControl - this has to come after all the FeatureGroups
-folium.LayerControl().add_to(m)
+folium.LayerControl(collapsed=False).add_to(m)
 
 # Write to file and call it a day
 map_filename = os.path.join(HTML_DIR, 'map.html')
