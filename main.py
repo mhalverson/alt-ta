@@ -21,13 +21,17 @@ LINZ_API_KEY = open(LINZ_API_KEY_PATH).readlines()[0].strip()
 if not LINZ_API_KEY:
     raise ValueError('no LINZ_API_KEY found at {}'.format(LINZ_API_KEY_PATH))
 
-topo = folium.TileLayer(
-    name='NZ Topo50',
-    tiles='http://tiles-{s}.data-cdn.linz.govt.nz/services;key=' + LINZ_API_KEY + '/tiles/v4/layer=50767/EPSG:3857/{z}/{x}/{y}.png',
-    attr='<a href=“http://data.linz.govt.nz”>Sourced from LINZ. CC BY 4.0</a>',
-    subdomains='abcd',
-)
-topo.add_to(m)
+
+topos = [['NZ Topo50', '50767'],
+         ['NZ Topo250', '50798']] # TODO when zooming, the tile layer should automatically switch between Topo50 and Topo250
+for topo in topos:
+    topo_layer = folium.TileLayer(
+        name=topo[0],
+        tiles='http://tiles-{s}.data-cdn.linz.govt.nz/services;key=' + LINZ_API_KEY + '/tiles/v4/layer=' + topo[1] + '/EPSG:3857/{z}/{x}/{y}.png',
+        attr='<a href="http://data.linz.govt.nz">Sourced from LINZ. CC BY 4.0</a>',
+        subdomains='abcd',
+    )
+    topo_layer.add_to(m)
 
 m.add_child(folium.LatLngPopup()) # enable this if you want to click to see the LatLng
 
