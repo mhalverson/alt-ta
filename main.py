@@ -47,8 +47,8 @@ point_adelaide_tarn = (-40.9430, 172.5435)
 desc_adelaide_tarn = 'Adelaide Tarn Hut'
 point_trevor_carter = (-41.3983, 172.3886)
 
-def linkify(url):
-    return '<a href="' + url + '">link</a>'
+def linkify(url, label):
+    return '<a href="' + url + '" target="_blank">' + label + '</a>'
 
 route = [
     {   KEY_SHORT_DESC: 'Road end',
@@ -145,14 +145,14 @@ alternate_routes = [
     # Farewell Spit to Adelaide
     { KEY_SHORT_DESC: 'Farewell Spit', KEY_LOCATION: (-40.5107, 172.7465), },
     { KEY_WAYPOINTS: ((-40.5003, 172.6853), (-40.5146, 172.6471), (-40.5302, 172.6376), (-40.5540, 172.6308), (-40.5842, 172.6325), (-40.5965, 172.5803), (-40.6154, 172.5510), (-40.6397, 172.5596), (-40.6962, 172.5409), (-40.7194, 172.5806), (-40.7797, 172.5591), (-40.8227, 172.5791), (-40.8425, 172.5581), (-40.8798, 172.5832), (-40.9003, 172.5793), (-40.9191, 172.5534), (-40.9334, 172.5553), (-40.9393, 172.5498), (-40.9430, 172.5517)),
-      KEY_NOTES: 'Boulder Lake to Adelaide - <a href="https://www.wildthings.club/trails/tasman/takaka/boulder-lake-to-anatoki-forks/?">link</a>',
+      KEY_LINKS: ['https://www.wildthings.club/trails/tasman/takaka/boulder-lake-to-anatoki-forks/?'],
       KEY_SHORT_DESC: desc_adelaide_tarn, KEY_LOCATION: point_adelaide_tarn, },
   ],
   [
     # Wangapeka to OGR
     { KEY_SHORT_DESC: 'Trevor Carter Hut', KEY_LOCATION: point_trevor_carter, },
     { KEY_WAYPOINTS: ((-41.3888, 172.3652), (-41.3972, 172.2952), (-41.3697, 172.2666), (-41.4229, 172.2426), (-41.4670, 172.2770), (-41.4664, 172.2388), (-41.4957, 172.2340), (-41.5147, 172.1969), (-41.5481, 172.1787), (-41.6056, 172.1994), (-41.6865, 172.2025), (-41.7234, 172.0984)),
-      KEY_NOTES: 'Johnson Hut to OGR - <a href="http://remotehuts.co.nz/huts/Johnson_Hut/">link</a>',
+      KEY_LINKS: ['http://remotehuts.co.nz/huts/Johnson_Hut/'],
       KEY_SHORT_DESC: 'Old Ghost Road - Lyell', KEY_LOCATION: (-41.7959, 172.0497), },
   ],
 ]
@@ -177,10 +177,6 @@ for r in gpx.routes:
     ).add_to(fg_actual_ta)
 very_end = gpx.routes[-1].points[-1]
 folium.Marker(location=(very_end.latitude, very_end.longitude)).add_to(fg_actual_ta)
-
-# Layer - notes
-fg_notes = folium.FeatureGroup(name='Notes', show=False)
-fg_notes.add_to(m)
 
 # Layer - Proposed route
 fg_proposed = folium.FeatureGroup(name='Proposed route', show=True)
@@ -209,18 +205,18 @@ for i, day in enumerate(route):
     if len(leg) < 2:
         continue
 
+    popup_text = [
+        'Day ' + str(i) + ':',
+        day.get(KEY_NOTES) or '',
+    ]
+    for j, link in enumerate(day.get(KEY_LINKS, [])):
+        popup_text.append(linkify(link, 'link' + str(j + 1)))
     folium.PolyLine(
         locations=leg,
         color='#ce4429',
         weight=5,
+        popup=folium.Popup(html='<br/>'.join(popup_text), max_width=300),
     ).add_to(fg_proposed)
-    if day.get(KEY_NOTES):
-        folium.PolyLine(
-            locations=leg,
-            color='#ff69b4',
-            weight=10,
-            popup=folium.Popup(html=day[KEY_NOTES]),
-        ).add_to(fg_notes)
 
 # Layer - Alternate routes
 fg_alternate = folium.FeatureGroup(name='Alternate routes', show=True)
@@ -228,13 +224,6 @@ fg_alternate.add_to(m)
 
 for route in alternate_routes:
     for i, day in enumerate(route):
-        popup = folium.Popup(day[KEY_SHORT_DESC])
-        marker = folium.Marker(
-            location=day[KEY_LOCATION],
-            popup=popup,
-        )
-        marker.add_to(fg_alternate)
-
         leg = []
         if i == 0:
             pass # do nothing!
@@ -250,18 +239,15 @@ for route in alternate_routes:
         if len(leg) < 2:
             continue
 
+        popup_text = day.get(KEY_NOTES) or []
+        for j, link in enumerate(day.get(KEY_LINKS, [])):
+            popup_text.append(linkify(link, 'link' + str(j + 1)))
         folium.PolyLine(
             locations=leg,
             color='#8486d3',
             weight=5,
+            popup=folium.Popup(html='<br/>'.join(popup_text), max_width=300),
         ).add_to(fg_alternate)
-        if day.get(KEY_NOTES):
-            folium.PolyLine(
-                locations=leg,
-                color='#ff69b4',
-                weight=10,
-                popup=folium.Popup(html=day[KEY_NOTES]),
-            ).add_to(fg_notes)
 
 # LayerControl - this has to come after all the FeatureGroups
 folium.LayerControl(collapsed=False).add_to(m)
