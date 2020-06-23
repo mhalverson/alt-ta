@@ -10,7 +10,7 @@ from route import (
     KEY_NOTES,
     KEY_LINKS,
     linkify,
-    route,
+    proposed_route,
     alternate_routes,
 )
 
@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 HTML_DIR = os.path.join(BASE_DIR, 'html')
 
 # Create the base map with tilesets
-MAP_DEFAULT_LOCATION = (-40.7819, 172.9978)
+MAP_DEFAULT_LOCATION = (-44.8177,168.0800)
 
 m = folium.Map(
     location=MAP_DEFAULT_LOCATION,
@@ -71,41 +71,42 @@ folium.Marker(location=(very_end.latitude, very_end.longitude)).add_to(fg_actual
 fg_proposed = folium.FeatureGroup(name='Proposed route', show=True)
 fg_proposed.add_to(m)
 
-for i, day in enumerate(route):
-    popup = folium.Popup(day[KEY_SHORT_DESC])
-    marker = folium.Marker(
-        location=day[KEY_LOCATION],
-        popup=popup,
-    )
-    marker.add_to(fg_proposed)
+for route in proposed_route:
+    for i, day in enumerate(route):
+        popup = folium.Popup(day[KEY_SHORT_DESC])
+        marker = folium.Marker(
+            location=day[KEY_LOCATION],
+            popup=popup,
+        )
+        marker.add_to(fg_proposed)
 
-    leg = []
-    if i == 0:
-        pass # do nothing!
-    else:
-        yesterday = route[i-1]
-        wake_up_coord = yesterday[KEY_LOCATION]
-        leg.append(wake_up_coord)
-    if day.get(KEY_WAYPOINTS):
-        leg.extend(day[KEY_WAYPOINTS])
-    sleep_coord = day[KEY_LOCATION]
-    leg.append(sleep_coord)
+        leg = []
+        if i == 0:
+            pass # do nothing!
+        else:
+            yesterday = route[i-1]
+            wake_up_coord = yesterday[KEY_LOCATION]
+            leg.append(wake_up_coord)
+        if day.get(KEY_WAYPOINTS):
+            leg.extend(day[KEY_WAYPOINTS])
+        sleep_coord = day[KEY_LOCATION]
+        leg.append(sleep_coord)
 
-    if len(leg) < 2:
-        continue
+        if len(leg) < 2:
+            continue
 
-    popup_text = [
-        'Day ' + str(i) + ':',
-        day.get(KEY_NOTES) or '',
-    ]
-    for j, link in enumerate(day.get(KEY_LINKS, [])):
-        popup_text.append(linkify(link[1], link[0]))
-    folium.PolyLine(
-        locations=leg,
-        color='#ce4429',
-        weight=5,
-        popup=folium.Popup(html='<br/>'.join(popup_text), max_width=300),
-    ).add_to(fg_proposed)
+        popup_text = [
+            'Day ' + str(i) + ':',
+            day.get(KEY_NOTES) or '',
+        ]
+        for j, link in enumerate(day.get(KEY_LINKS, [])):
+            popup_text.append(linkify(link[1], link[0]))
+        folium.PolyLine(
+            locations=leg,
+            color='#ce4429',
+            weight=5,
+            popup=folium.Popup(html='<br/>'.join(popup_text), max_width=300),
+        ).add_to(fg_proposed)
 
 # Layer - Alternate routes
 fg_alternate = folium.FeatureGroup(name='Alternate routes', show=True)
