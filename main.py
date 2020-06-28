@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 HTML_DIR = os.path.join(BASE_DIR, 'html')
 
 # Create the base map with tilesets
-MAP_DEFAULT_LOCATION = (-44.8177,168.0800)
+MAP_DEFAULT_LOCATION = (-45.3010,167.4283)
 
 m = folium.Map(
     location=MAP_DEFAULT_LOCATION,
