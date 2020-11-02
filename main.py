@@ -18,11 +18,13 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 HTML_DIR = os.path.join(BASE_DIR, 'html')
 
 # Create the base map with tilesets
-MAP_DEFAULT_LOCATION = (-45.3010,167.4283)
+MAP_DEFAULT_LOCATION = (-42.1342,172.6169)
+#MAP_DEFAULT_LOCATION = (-45.3010,167.4283)
+MAP_DEFAULT_ZOOM=11
 
 m = folium.Map(
     location=MAP_DEFAULT_LOCATION,
-    zoom_start=12,
+    zoom_start=MAP_DEFAULT_ZOOM,
     control_scale=True, # show a scale bar e.g. "100 km" or "50 mi"
     tiles=None,
 )
@@ -129,7 +131,7 @@ for route in alternate_routes:
         if len(leg) < 2:
             continue
 
-        popup_text = day.get(KEY_NOTES) or []
+        popup_text = list(day.get(KEY_NOTES) or [])
         for j, link in enumerate(day.get(KEY_LINKS, [])):
             popup_text.append(linkify(link[1], link[0]))
         folium.PolyLine(
