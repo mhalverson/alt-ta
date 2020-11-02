@@ -416,6 +416,56 @@ proposed_route = [
     },
   ],
 
+  [ # Lewis Pass to Arthurs Pass
+    {   KEY_SHORT_DESC: 'Lewis Pass - Boyle Village',
+        KEY_LOCATION: (-42.5165,172.3841), },
+    {   KEY_WAYPOINTS: (
+            (-42.5527,172.3432), (-42.5315,172.2834), (-42.5280,172.2436),
+        ),
+        KEY_NOTES: '? hrs',
+        KEY_LINKS: [
+            ['DOC Matiri Valley', 'https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/kahurangi-national-park/things-to-do/tracks/matiri-valley-and-1000-acre-plateau-tramping-tracks'],
+        ],
+        KEY_SHORT_DESC: 'Lake Man Biv',
+        KEY_LOCATION: (-42.5493,172.2254), },
+    {   KEY_WAYPOINTS: (
+            (-42.5881,172.2131), (-42.5900,172.1758),
+        ),
+        KEY_NOTES: '? hrs',
+        KEY_LINKS: [
+            ['tramper.nz', 'https://tramper.nz/forums/thread/1136?post=72475#72475'],
+        ],
+        KEY_SHORT_DESC: 'Nelson Tops',
+        KEY_LOCATION: (-42.6044,172.1821), },
+    {   KEY_WAYPOINTS: (
+            (-42.6211,172.1534), (-42.6194,172.1442), (-42.6264,172.0946), (-42.6221,172.0777),
+        ),
+        KEY_NOTES: '? hrs',
+        KEY_LINKS: [
+            ['tramper.nz', 'https://tramper.nz/forums/thread/1136?post=72475#72475'],
+        ],
+        KEY_SHORT_DESC: 'Tutaekuri Tops',
+        KEY_LOCATION: (-42.6316,172.0413), },
+    {   KEY_WAYPOINTS: (
+            (-42.6376,171.9811), (-42.6421,171.9745), (-42.6466,171.9674), (-42.6525,171.9686), (-42.6535,171.9620), (-42.6593,171.9575), (-42.6658,171.9429), (-42.6674,171.9324),
+        ),
+        KEY_NOTES: '? hrs',
+        KEY_LINKS: [
+            ['tramper.nz', 'https://tramper.nz/forums/thread/1136?post=72475#72475'],
+        ],
+        KEY_SHORT_DESC: 'Tutaekuri Tops',
+        KEY_LOCATION: (-42.6766,171.9235), },
+    {   KEY_WAYPOINTS: (
+            (-42.6824,171.9153), (-42.7080,171.9069), (-42.7193,171.8846),
+        ),
+        KEY_NOTES: '? hrs',
+        KEY_LINKS: [
+            ['tramper.nz', 'https://tramper.nz/forums/thread/1136?post=72475#72475'],
+        ],
+        KEY_SHORT_DESC: 'Harper Pass',
+        KEY_LOCATION: (-42.7286,171.8837), },
+  ],
+
   [ # Fiordland part 1 - Earl Mtns + Worsley + Glaisnock
     {   KEY_SHORT_DESC: 'Milford Road',
         KEY_LOCATION: (-44.8177,168.0800), },
